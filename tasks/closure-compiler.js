@@ -4,6 +4,7 @@ module.exports = function(grunt) {
 
   var exec = require('child_process').exec,
       fs = require('fs'),
+      path = require('path'),
       gzip = require('zlib').gzip;
 
   // ==========================================================================
@@ -32,9 +33,13 @@ module.exports = function(grunt) {
       return false;
     }
 
-    var command = 'java -jar ' + closurePath + '/build/compiler.jar';
 
-    data.js = grunt.file.expandFiles(data.js);
+    closurePath = path.resolve(closurePath);
+    closurePath = fs.lstatSync(closurePath).isDirectory() ? (closurePath + '/build/compiler.jar') : closurePath;
+    var command = 'java -jar ' + closurePath;
+
+    data.js = grunt.file.expand(data.js,{filter:'isFile'});
+
 
     // Sanitize options passed.
     if (!data.js.length) {
